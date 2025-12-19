@@ -4,8 +4,9 @@ services:
     container_name: demo_1_db
     env_file:
       - .env
-    ports:
-      - "5432:5432"
+    # For a lab, do NOT expose Postgres publicly unless required
+    # ports:
+    #   - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     restart: unless-stopped
@@ -18,7 +19,6 @@ services:
   backend:
     build: ./api
     container_name: fastapi_app
-    # IMPORTANT: do not expose backend publicly
     expose:
       - "8000"
     env_file:
@@ -27,21 +27,48 @@ services:
       db:
         condition: service_healthy
     restart: unless-stopped
+    # These labels/env vars are how nginx-proxy + acme-companion discovers your app
+    environment:
+      - VIRTUAL_HOST=api.vty.life
+      - VIRTUAL_PORT=8000
+      - LETSENCRYPT_HOST=api.vty.life
+      - LETSENCRYPT_EMAIL=servicevg06@gmail.com
 
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: demo_nginx
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:alpine
+    container_name: nginx-proxy
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      # Nginx config
-      - ./nginx/conf.d:/etc/nginx/conf.d:ro
-      # TLS certs (pick one strategy below)
-      - ./nginx/certs:/etc/nginx/certs:ro
+      # Required: read container metadata from Docker
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      # Cert storage + vhost configs
+      - nginx_certs:/etc/nginx/certs:rw
+      - nginx_vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
+    restart: unless-stopped
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: acme-companion
     depends_on:
-      - backend
+      - nginx-proxy
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+      # (Optional) Default email; per-app LETSENCRYPT_EMAIL still works
+      # - DEFAULT_EMAIL=you@example.com
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx_certs:/etc/nginx/certs:rw
+      - nginx_vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html:rw
+      - acme_data:/etc/acme.sh
     restart: unless-stopped
 
 volumes:
   db_data:
+  nginx_certs:
+  nginx_vhost:
+  nginx_html:
+  acme_data:
