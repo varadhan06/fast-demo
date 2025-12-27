@@ -4,7 +4,7 @@ FROM python:3.12-slim
 WORKDIR /api
 
 # Install supervisor and create log directory
-RUN apt-get update && apt-get install -y supervisor procps && \
+RUN apt-get update && apt-get install -y supervisor  procps && \
     mkdir -p /var/log/supervisor && \
     rm -rf /var/lib/apt/lists/*
 
