@@ -181,7 +181,7 @@ cd scripts
 
 chmod +x create_ssh_user.sh
 
-sudo ./create_ssh_user.sh YOURUSERNAME "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBexamplekey user@laptop"
+sudo ./create_ssh_user.sh YOURUSERNAME "YOUR PUBLIC KEY"
 
 ## Security Notes
 

@@ -54,7 +54,7 @@ echo "SSH key installed for user '$USERNAME'"
 # Optional: Grant sudo access
 # Uncomment if required
 # -----------------------------
-# usermod -aG sudo "$USERNAME"
-# echo "Sudo access granted to '$USERNAME'"
+usermod -aG sudo "$USERNAME"
+echo "Sudo access granted to '$USERNAME'"
 
 echo "User setup completed successfully"
