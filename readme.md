@@ -52,7 +52,7 @@ sudo apt install docker-compose-plugin -y
 sudo apt install git -y
 
 # Clone and start the application
-cd /home/ubuntu/
+cd /home/$(whoami)/
 git clone https://github.com/varadhan06/fast-demo.git
 cd fast-demo
 docker compose up -d
@@ -60,12 +60,12 @@ sleep 30
 docker compose exec backend python setup.py
 
 # Setup automated backups
-mkdir -p /home/ubuntu/backups
-chmod 700 /home/ubuntu/backups
+mkdir -p /home/$(whoami)/backups
+chmod 700 /home/$(whoami)/backups
 
-cat > /home/ubuntu/backup-db.sh << 'EOF'
+cat > /home/$(whoami)/backup-db.sh << 'EOF'
 #!/bin/bash
-BACKUP_DIR="/home/ubuntu/backups"
+BACKUP_DIR="/home/$(whoami)/backups"
 CONTAINER_NAME="demo_1_db"
 DB_NAME="devops_docker_demo_1"
 DB_USER="postgres"
@@ -77,11 +77,11 @@ gzip $BACKUP_FILE
 find $BACKUP_DIR -name "*.sql.gz" -mtime +7 -delete
 EOF
 
-chmod +x /home/ubuntu/backup-db.sh
-echo "0 2 * * * /home/ubuntu/backup-db.sh" | crontab -
+chmod +x /home/$(whoami)/backup-db.sh
+echo "0 2 * * * /home/$(whoami)/backup-db.sh" | crontab -
 
 # Setup SSH monitoring with Discord notifications
-cd /home/ubuntu/fast-demo/scripts
+cd /home/$(whoami)/fast-demo/scripts
 chmod +x setup_ssh_monitoring.sh
 
 # Create Discord config (replace with your webhook URL)
@@ -149,24 +149,27 @@ The application includes automated SSH monitoring that sends Discord notificatio
 ### Setup SSH Monitoring
 
 1. **Get Discord Webhook URL:**
+
    - Go to your Discord server settings
    - Create a webhook in the desired channel
    - Copy the webhook URL
 
 2. **Run setup script:**
+
    ```bash
-   cd /home/ubuntu/fast-demo/scripts
+   cd /home/$(whoami)/fast-demo/scripts
    sudo ./setup_ssh_monitoring.sh
    ```
 
 3. **Monitor status:**
+
    ```bash
    # Check if monitoring is running
    sudo systemctl status ssh-monitor.timer
-   
+
    # View recent alerts
    sudo journalctl -u ssh-monitor.service -f
-   
+
    # Test notification
    sudo /usr/local/bin/monitoring/notify_discord.sh "Test" "SSH monitoring active"
    ```
@@ -175,14 +178,14 @@ The application includes automated SSH monitoring that sends Discord notificatio
 
 - **Check interval:** Every 2 minutes
 - **Alert threshold:** 3+ failed attempts in 5 minutes
-- **Log location:** `/var/log/auth.log` (Ubuntu)
+- **Log location:** `/var/log/auth.log` ($(whoami))
 - **Config file:** `/etc/monitoring/discord.env`
 
 ## Database Backups
 
 Automated daily backups at 2 AM:
 
-- Location: `/home/ubuntu/backups/`
+- Location: `/home/$(whoami)/backups/`
 - Retention: 7 days
 - Format: Compressed SQL dumps
 

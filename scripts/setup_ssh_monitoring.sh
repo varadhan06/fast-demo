@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-echo "Setting up SSH monitoring with Discord notifications for Ubuntu..."
+echo "Setting up SSH monitoring with Discord notifications for $(whoami)..."
 
 # Create monitoring directory
 sudo mkdir -p /usr/local/bin/monitoring
@@ -27,7 +27,7 @@ EOF
 
 sudo chmod 600 /etc/monitoring/discord.env
 
-# Ensure rsyslog is configured for auth logging (Ubuntu default)
+# Ensure rsyslog is configured for auth logging ($(whoami) default)
 sudo systemctl restart rsyslog
 
 # Enable and start the timer
