@@ -1,36 +1,36 @@
-# Kill the FastAPI process
+### Kill the FastAPI process
 
 docker compose exec backend supervisorctl stop fastapi
 
-# Check status (should show STOPPED)
+### Check status (should show STOPPED)
 
 docker compose exec backend supervisorctl status
 
-# Restart it
+### Restart it
 
 docker compose exec backend supervisorctl start fastapi
 
-# Verify it's running again
+### Verify it's running again
 
 docker compose exec backend supervisorctl status
 
-# Find the FastAPI process PID
+### Find the FastAPI process PID
 
 docker compose exec backend supervisorctl status
 
-# Kill it by PID (supervisord should restart it automatically)
+### Kill it by PID (supervisord should restart it automatically)
 
 docker compose exec backend kill -9 <PID>
 
-# Check status - should show RUNNING again with new PID
+### Check status - should show RUNNING again with new PID
 
 docker compose exec backend supervisorctl status
 
-# Test the API endpoint
+### Test the API endpoint
 
 curl http://localhost/status
 
-# or
+### or
 
 curl http://YOUR_IP/status
 
