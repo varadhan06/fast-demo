@@ -79,6 +79,27 @@ EOF
 
 chmod +x /home/ubuntu/backup-db.sh
 echo "0 2 * * * /home/ubuntu/backup-db.sh" | crontab -
+
+# Setup SSH monitoring with Discord notifications
+cd /home/ubuntu/fast-demo/scripts
+chmod +x setup_ssh_monitoring.sh
+
+# Create Discord config (replace with your webhook URL)
+mkdir -p /etc/monitoring
+cat > /etc/monitoring/discord.env << 'EOF'
+DISCORD_WEBHOOK_URL="YOUR_DISCORD_WEBHOOK_URL_HERE"
+HOSTNAME_TAG="Production-EC2"
+EOF
+chmod 600 /etc/monitoring/discord.env
+
+# Install SSH monitoring
+mkdir -p /usr/local/bin/monitoring
+cp check_ssh_auth.sh notify_discord.sh /usr/local/bin/monitoring/
+chmod +x /usr/local/bin/monitoring/*.sh
+cp ssh-monitor.service ssh-monitor.timer /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable ssh-monitor.timer
+systemctl start ssh-monitor.timer
 ```
 
 ## API Endpoints
@@ -116,6 +137,46 @@ docker compose exec backend supervisorctl restart fastapi
 # View logs
 docker compose exec backend cat /var/log/supervisor/fastapi.out.log
 ```
+
+## SSH Security Monitoring
+
+The application includes automated SSH monitoring that sends Discord notifications for:
+
+- **Failed password attempts** (brute force detection)
+- **SSH key authentication failures** (invalid key attempts)
+- **Successful logins** (awareness notifications)
+
+### Setup SSH Monitoring
+
+1. **Get Discord Webhook URL:**
+   - Go to your Discord server settings
+   - Create a webhook in the desired channel
+   - Copy the webhook URL
+
+2. **Run setup script:**
+   ```bash
+   cd /home/ubuntu/fast-demo/scripts
+   sudo ./setup_ssh_monitoring.sh
+   ```
+
+3. **Monitor status:**
+   ```bash
+   # Check if monitoring is running
+   sudo systemctl status ssh-monitor.timer
+   
+   # View recent alerts
+   sudo journalctl -u ssh-monitor.service -f
+   
+   # Test notification
+   sudo /usr/local/bin/monitoring/notify_discord.sh "Test" "SSH monitoring active"
+   ```
+
+### Configuration
+
+- **Check interval:** Every 2 minutes
+- **Alert threshold:** 3+ failed attempts in 5 minutes
+- **Log location:** `/var/log/auth.log` (Ubuntu)
+- **Config file:** `/etc/monitoring/discord.env`
 
 ## Database Backups
 

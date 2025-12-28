@@ -72,20 +72,8 @@ sudo cp /home/ubuntu/fast-demo/scripts/check_ssh_auth.sh /usr/local/bin/monitori
 # make script executable
 sudo chmod +x /usr/local/bin/monitoring/check_ssh_auth.sh
 
-# Set up cron jobs
-sudo crontab -e
-
-# Disk usage every 5 minutes
-*/2 * * * * THRESHOLD_PERCENT=85 MOUNTPOINT=/ /usr/local/bin/monitoring/check_disk.sh
-
-# CPU/load every 2 minutes
-*/2 * * * * LOAD_PER_CORE_THRESHOLD=0.20 /usr/local/bin/monitoring/check_cpu_load.sh
-
-# SSH failures every 5 minutes (10-minute window)
-*/2 * * * * WINDOW_MINUTES=10 FAILED_THRESHOLD=10 /usr/local/bin/monitoring/check_ssh_auth.sh
-
-# Backup database every 5 minutes
-*/5 * * * * /usr/local/bin/backup_db.sh (10-minute window)
+# Set up automated cron jobs
+chmod +x /home/ubuntu/fast-demo/scripts/setup_cron_jobs.sh && /home/ubuntu/fast-demo/scripts/setup_cron_jobs.sh
 
 
 # Test CPU load alert

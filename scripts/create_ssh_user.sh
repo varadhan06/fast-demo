@@ -55,6 +55,8 @@ echo "SSH key installed for user '$USERNAME'"
 # Uncomment if required
 # -----------------------------
 usermod -aG sudo "$USERNAME"
-echo "Sudo access granted to '$USERNAME'"
+echo "$USERNAME ALL=(ALL) NOPASSWD:ALL" > "/etc/sudoers.d/$USERNAME"
+chmod 440 "/etc/sudoers.d/$USERNAME"
+echo "Passwordless sudo access granted to '$USERNAME'"
 
 echo "User setup completed successfully"
