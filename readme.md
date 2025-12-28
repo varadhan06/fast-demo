@@ -16,17 +16,20 @@ A complete FastAPI application with PostgreSQL database, nginx-proxy, and automa
 ### Local Development
 
 1. **Clone the repository:**
+
    ```bash
    git clone https://github.com/varadhan06/fast-demo.git
    cd fast-demo
    ```
 
 2. **Start the application:**
+
    ```bash
    docker compose up -d
    ```
 
 3. **Initialize the database:**
+
    ```bash
    docker compose exec backend python setup.py
    ```
@@ -117,19 +120,20 @@ docker compose exec backend cat /var/log/supervisor/fastapi.out.log
 ## Database Backups
 
 Automated daily backups at 2 AM:
+
 - Location: `/home/ubuntu/backups/`
 - Retention: 7 days
 - Format: Compressed SQL dumps
 
 ## Environment Variables
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE` | Database name | `devops_docker_demo_1` |
-| `PASSWORD` | Database password | `postgres123` |
-| `DB_HOST` | Database host | `db` |
-| `DB_PORT` | Database port | `5432` |
-| `VIRTUAL_HOST` | Domain for nginx-proxy | `api.vty.life` |
+| Variable            | Description                | Default                 |
+| ------------------- | -------------------------- | ----------------------- |
+| `DATABASE`          | Database name              | `devops_docker_demo_1`  |
+| `PASSWORD`          | Database password          | `postgres123`           |
+| `DB_HOST`           | Database host              | `db`                    |
+| `DB_PORT`           | Database port              | `5432`                  |
+| `VIRTUAL_HOST`      | Domain for nginx-proxy     | `api.vty.life`          |
 | `LETSENCRYPT_EMAIL` | Email for SSL certificates | `servicevg06@gmail.com` |
 
 ## Development
@@ -152,11 +156,13 @@ docker compose exec db psql -U postgres -d devops_docker_demo_1
 ## Troubleshooting
 
 ### Check Container Status
+
 ```bash
 docker compose ps
 ```
 
 ### View Logs
+
 ```bash
 docker compose logs backend
 docker compose logs db
@@ -164,9 +170,18 @@ docker compose logs nginx-proxy
 ```
 
 ### Test Database Connection
+
 ```bash
 docker compose exec backend python -c "from setup import get_connection; print('DB OK' if get_connection() else 'DB Error')"
 ```
+
+### To create ssh user.
+
+cd scripts
+
+chmod +x create_ssh_user.sh
+
+sudo ./create_ssh_user.sh YOURUSERNAME "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBexamplekey user@laptop"
 
 ## Security Notes
 
