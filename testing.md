@@ -1,19 +1,3 @@
-# Testing Supervisord
-
-docker compose exec backend supervisorctl status
-
-# Check supervisord main log
-
-docker compose exec backend cat /var/log/supervisor/supervisord.log
-
-# Check FastAPI logs
-
-docker compose exec backend cat /var/log/supervisor/fastapi.out.log
-
-# Check worker logs
-
-docker compose exec backend cat /var/log/supervisor/worker.out.log
-
 # Kill the FastAPI process
 
 docker compose exec backend supervisorctl stop fastapi
