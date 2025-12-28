@@ -14,12 +14,8 @@ else
   exit 2
 fi
 
-# Get recent log entries
-if command -v journalctl >/dev/null 2>&1; then
-  RECENT_LOGS=$(journalctl -u ssh --since "${WINDOW_MINUTES} min ago" 2>/dev/null || echo "")
-else
-  RECENT_LOGS=$(tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
-fi
+# Get recent log entries from auth.log directly
+RECENT_LOGS=$(tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
 
 # Check for failed password attempts
 PASSWORD_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Failed password|Invalid user" | wc -l | tr -d ' ')

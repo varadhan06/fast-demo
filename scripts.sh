@@ -12,13 +12,13 @@ git clone https://github.com/varadhan06/fast-demo.git
 cd fast-demo
 
 # Start the containers
-docker compose up -d
+sudo docker compose up -d
 
 # Wait for containers to be ready
 sleep 30
 
 # Initialize the database
-docker compose exec backend python setup.py
+sudo docker compose exec backend python setup.py
 
 # Database backup script
 sudo cp /home/$(whoami)/fast-demo/scripts/backup_db.sh /usr/local/bin/backup_db.sh
@@ -41,7 +41,7 @@ HOSTNAME_TAG="$(hostname)"
 # Until here, then save and exit the editor
 
 # set permissions
-sudo chmod 600 /etc/monitoring/discord.env
+sudo chmod 644 /etc/monitoring/discord.env
 
 
 # Post Discord message script
@@ -72,8 +72,21 @@ sudo cp /home/$(whoami)/fast-demo/scripts/check_ssh_auth.sh /usr/local/bin/monit
 # make script executable
 sudo chmod +x /usr/local/bin/monitoring/check_ssh_auth.sh
 
-# Set up automated cron jobs
-chmod +x /home/$(whoami)/fast-demo/scripts/setup_cron_jobs.sh && /home/$(whoami)/fast-demo/scripts/setup_cron_jobs.sh
+# Set up cron jobs for current user
+crontab -e
+
+# Disk usage every 2 minutes
+*/2 * * * * THRESHOLD_PERCENT=85 MOUNTPOINT=/ sudo /usr/local/bin/monitoring/check_disk.sh
+
+# CPU/load every 2 minutes  
+*/2 * * * * LOAD_PER_CORE_THRESHOLD=0.20 sudo /usr/local/bin/monitoring/check_cpu_load.sh
+
+# SSH monitoring every 2 minutes
+*/2 * * * * WINDOW_MINUTES=5 FAILED_THRESHOLD=3 sudo /usr/local/bin/monitoring/check_ssh_auth.sh
+
+# Database backup every 2 minutes 
+*/5 * * * * sudo /usr/local/bin/backup_db.sh
+
 
 
 # Test CPU load alert
