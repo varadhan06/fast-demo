@@ -46,7 +46,7 @@ sudo chmod 644 /etc/monitoring/discord.env
 
 # Post Discord message script
 sudo mkdir -p /usr/local/bin/monitoring
-cp /home/$(whoami)/fast-demo/scripts/notify_discord.sh /usr/local/bin/monitoring/notify_discord.sh
+sudo cp /home/$(whoami)/fast-demo/scripts/notify_discord.sh /usr/local/bin/monitoring/notify_discord.sh
 
 # make script executable
 sudo chmod +x /usr/local/bin/monitoring/notify_discord.sh
