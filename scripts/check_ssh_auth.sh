@@ -1,31 +1,41 @@
 #!/bin/bash
 set -euo pipefail
 
+echo "Script starting..."
+
 # Configuration
 WINDOW_MINUTES="${WINDOW_MINUTES:-10}"
 FAILED_THRESHOLD="${FAILED_THRESHOLD:-1}"
 NOTIFY_SCRIPT="/usr/local/bin/monitoring/notify_discord.sh"
 
+echo "Config: FAILED_THRESHOLD=$FAILED_THRESHOLD"
+
 # Find auth log
 if [[ -f /var/log/auth.log ]]; then
   AUTH_LOG="/var/log/auth.log"
+  echo "Found auth log: $AUTH_LOG"
 else
   "$NOTIFY_SCRIPT" "SSH Monitor Error" "No auth log found"
   exit 2
 fi
 
 # Get recent log entries from auth.log directly
-RECENT_LOGS=$(sudo tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
+echo "Reading auth log..."
+RECENT_LOGS=$(tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
+echo "Log entries read: $(echo "$RECENT_LOGS" | wc -l) lines"
 
 # Check for failed password attempts
-PASSWORD_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Failed password|Invalid user" | wc -l | tr -d ' ')
+PASSWORD_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Failed password|Invalid user" | wc -l | tr -d ' ' || echo "0")
+echo "Password failures: $PASSWORD_FAILURES"
 if (( PASSWORD_FAILURES >= FAILED_THRESHOLD )); then
   SAMPLE=$(echo "$RECENT_LOGS" | grep -E "Failed password|Invalid user" | tail -n 5)
   "$NOTIFY_SCRIPT" "🚨 SSH Password Attacks ($PASSWORD_FAILURES attempts)" "$SAMPLE"
 fi
 
 # Check for SSH key authentication failures
-KEY_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Connection closed by authenticating user|Failed publickey|Invalid user.*ssh2" | wc -l | tr -d ' ')
+KEY_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Connection closed by authenticating user|Failed publickey|Invalid user.*ssh2" | wc -l | tr -d ' ' || echo "0")
+echo "Key failures: $KEY_FAILURES"
+echo "Threshold: $FAILED_THRESHOLD"
 if (( KEY_FAILURES >= FAILED_THRESHOLD )); then
   SAMPLE=$(echo "$RECENT_LOGS" | grep -E "Connection closed by authenticating user|Failed publickey|Invalid user.*ssh2" | tail -n 5)
   "$NOTIFY_SCRIPT" "🔑 SSH Key Auth Failures ($KEY_FAILURES attempts)" "$SAMPLE"
