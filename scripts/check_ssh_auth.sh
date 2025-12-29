@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Configuration
 WINDOW_MINUTES="${WINDOW_MINUTES:-10}"
-FAILED_THRESHOLD="${FAILED_THRESHOLD:-5}"
+FAILED_THRESHOLD="${FAILED_THRESHOLD:-1}"
 NOTIFY_SCRIPT="/usr/local/bin/monitoring/notify_discord.sh"
 
 # Find auth log
@@ -15,7 +15,7 @@ else
 fi
 
 # Get recent log entries from auth.log directly
-RECENT_LOGS=$(tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
+RECENT_LOGS=$(sudo tail -n 1000 "$AUTH_LOG" 2>/dev/null || echo "")
 
 # Check for failed password attempts
 PASSWORD_FAILURES=$(echo "$RECENT_LOGS" | grep -E "Failed password|Invalid user" | wc -l | tr -d ' ')

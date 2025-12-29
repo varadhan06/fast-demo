@@ -79,13 +79,13 @@ crontab -e
 */2 * * * * THRESHOLD_PERCENT=85 MOUNTPOINT=/ sudo /usr/local/bin/monitoring/check_disk.sh
 
 # CPU/load every 2 minutes  
-*/2 * * * * LOAD_PER_CORE_THRESHOLD=0.20 sudo /usr/local/bin/monitoring/check_cpu_load.sh
+*/2 * * * * LOAD_PER_CORE_THRESHOLD=0.02 /usr/local/bin/monitoring/check_cpu_load.sh
 
 # SSH monitoring every 2 minutes
-*/2 * * * * WINDOW_MINUTES=5 FAILED_THRESHOLD=3 sudo /usr/local/bin/monitoring/check_ssh_auth.sh
+*/2 * * * * WINDOW_MINUTES=5 FAILED_THRESHOLD=1 /usr/local/bin/monitoring/check_ssh_auth.sh
 
 # Database backup every 2 minutes 
-*/5 * * * * sudo /usr/local/bin/backup_db.sh
+*/5 * * * * /usr/local/bin/backup_db.sh
 
 
 
